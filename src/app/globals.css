@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/*
+::selection {
+
+    mix-blend-mode: difference;
+
+}
+ */
