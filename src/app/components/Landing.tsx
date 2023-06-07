@@ -86,7 +86,8 @@ function Sphere({sound}: {sound: Howl}) {
 
     useFrame(() => {
         analyser.getByteFrequencyData(data);
-        material_ref.current.thickness = data[100];
+        //material_ref.current.thickness = convertRange({params: {}})[50];
+        //material_ref.current.chromaticAberration = data[10000];
         console.log(material_ref.thickness);
     });
 
@@ -94,14 +95,15 @@ function Sphere({sound}: {sound: Howl}) {
     return (
         <mesh position={[0, 0, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()} onClick={() => handleClick()}>
             <icosahedronGeometry args={[55, 50]} />
-            <MeshTransmissionMaterial ref={material_ref}
+            <AnimatedTransmission
                 anisotropy={0}
                 anisotropicBlur={0}
                 transmission={1}
                 roughness={0.05}
                 metalness={0}
                 distortionScale={0}
-                chromaticAberration={.4}
+                thickness={props.thickness}
+                chromaticAberration={props.chromatic}
                 temporalDistortion={0}/>
         </mesh>
     );
