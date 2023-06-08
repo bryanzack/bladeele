@@ -10,9 +10,6 @@ import { MeshTransmissionMaterial } from "@react-three/drei"
 import { Howl } from "howler";
 import {Material, Mesh, TextureLoader} from "three";
 import convertRange from "@/lib/convertRange";
-import {gsap} from 'gsap-trial';
-import Link from "next/link";
-import BurgerMenu from "@/app/components/BurgerMenu";
 import {useAppDispatch, useAppSelector} from "@/lib/redux/hooks";
 import {ListInfo} from "@/utils/types";
 import {setMainHovered, setTrackList} from "@/lib/redux/mainSlice";
@@ -45,6 +42,7 @@ function Rig({ children }: {children: ReactNode }) {
 
 function Sphere({sound}: {sound: Howl}) {
     const hovered = useAppSelector((state: RootState) => state.main.main_hovered);
+    const did_win = useAppSelector((state: RootState) => state.main.did_win);
     const dispatch = useAppDispatch();
 
     const [hover, setHover] = useState(false);
@@ -53,7 +51,9 @@ function Sphere({sound}: {sound: Howl}) {
 
     const mouseEnter = () => {
         document.body.style.cursor = 'pointer';
-        dispatch(setMainHovered(true));
+        if (!did_win) {
+            dispatch(setMainHovered(true));
+        }
         setHover(true);
         sound.volume(0.1);
         sound.play();
@@ -126,9 +126,9 @@ function Sphere({sound}: {sound: Howl}) {
         material_ref.current!.roughness = low_rough;
 
         if (hovered) {
-            state.camera.position.lerp(vec.set(250, 0, 140), .008);
+            state.camera.position.lerp(vec.set(250, 0, 140), .05);
         } else {
-            state.camera.position.lerp(vec.set(100, 0, 140), 0.008);
+            state.camera.position.lerp(vec.set(100, 0, 140), .05);
         }
 
     });
@@ -198,7 +198,7 @@ function AlbumSphere({x, y, texture, album_name, list_info}: {x: number, y: numb
     const scale_props = useSpring({
         scale: main_hovered ? 1 : 0,
         config: {
-            duration: 1000,
+            duration: 100,
         }
     });
 
@@ -262,9 +262,10 @@ export function AlbumSpheres({list_info}: {list_info: ListInfo}) {
     )
 }
 
-export default async function Landing({list_info}: {list_info: ListInfo}) {
+export default async function Landing({list_info, base64}: {list_info: ListInfo, base64: string}) {
+
     const sound = new Howl({
-        src: ['cut_file.mp3'],
+        src: [`data:audio/mp3;base64,${base64}`],
         volume: .1,
         onload: function() {
             console.log('loaded sound')

@@ -4,19 +4,22 @@ import Link from "next/link";
 import {useAppDispatch, useAppSelector} from "@/lib/redux/hooks";
 import {RootState} from "@/lib/redux/store";
 import isGuessCorrect from "@/lib/actions/checkGuess";
-import {setMainHovered, setTrackList} from "@/lib/redux/mainSlice";
+import {setDidWin, setMainHovered, setTrackList} from "@/lib/redux/mainSlice";
 
 export default function Info() {
     const track_list = useAppSelector((state: RootState) => state.main.track_list);
+    const did_win = useAppSelector((state: RootState) => state.main.did_win);
 
     const dispatch = useAppDispatch();
     const handleGuess = async (guess: string) => {
         if (await isGuessCorrect(guess)) {
             console.log('CORRECT');
+            dispatch(setDidWin(true));
             dispatch(setMainHovered(false));
-            dispatch(setTrackList(['']));
+            dispatch(setTrackList([guess]));
         } else {
             console.log('INCORRECT');
+            dispatch(setTrackList(track_list.filter(item => item !== guess)));
         }
     }
     return (
