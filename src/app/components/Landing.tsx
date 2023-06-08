@@ -1,10 +1,11 @@
 'use client';
 import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import {STLLoader} from "three-stdlib";
-import {ReactNode, useEffect, useRef, useState} from "react";
+import {ReactNode, startTransition, useEffect, useRef, useState} from "react";
 import {OrbitControls, PerspectiveCamera, useTexture} from "@react-three/drei";
 import * as THREE from 'three';
 import { useSpring, animated} from "@react-spring/three";
+import { animated as a } from '@react-spring/web'
 import { MeshTransmissionMaterial } from "@react-three/drei"
 import { Howl } from "howler";
 import {Material, Mesh, TextureLoader} from "three";
@@ -125,7 +126,8 @@ function Sphere({sound}: {sound: Howl}) {
     return (
         <mesh position={[0, 0, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()} onClick={() => handleClick()}>
             <icosahedronGeometry args={[55, 50]} />
-            <MeshTransmissionMaterial
+            <AnimatedTransmission
+                thickness={props.thickness}
                 ref={material_ref}
                 anisotropy={0}
                 anisotropicBlur={0}
@@ -149,7 +151,7 @@ function Logo() {
 
 
     return (
-        <mesh ref={ref} position={[1, 1, 0.8]}
+        <mesh ref={ref} position={[1, -1, 0]}
               rotation={[180.7, 0, 0]}>
             <primitive object={geom} attach={'geometry'}/>
             <meshPhysicalMaterial color={'white'} flatShading={false}
@@ -244,9 +246,17 @@ export default async function Landing({json_string}: {json_string: string}) {
         }
     });
 
-    useEffect(() => {
+    const [active, setActive] = useState(true);
 
-    }, []);
+    const props = useSpring({
+        to: {
+            opacity: active ? 1 : 0,
+            pointerEvents: active ? 'auto' : 'none',
+        },
+        config: {
+            duration: 700,
+        }
+    });
 
     return (
         <div className={'w-screen h-screen flex items-center justify-center bg-black absolute'}>
@@ -256,13 +266,18 @@ export default async function Landing({json_string}: {json_string: string}) {
                     <span className={'relative text-white text-[20px] self-end'}>B_ZY</span>
                 </div>
             </div>
+            <a.div style={props}
+                className={`w-screen h-screen flex items-center justify-center fixed z-50 bg-black`}
+                onClick={() => startTransition(() => setActive(false))}>
+                <span className={'text-white font-montserrat text-2xl cursor-pointer'}>Enter.</span>
+            </a.div>
 
             <Canvas camera={{position: [100, 0, 140]}} dpr={4}>
                 {/*<Background /> */}
                 <OrbitControls />
                 <Rig>
                     <Logo />
-                    {/*<AlbumSpheres />*/}
+                    <AlbumSpheres />
                     <Sphere sound={sound} />
                 </Rig>
                 <directionalLight
