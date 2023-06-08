@@ -10,6 +10,13 @@ import { MeshTransmissionMaterial } from "@react-three/drei"
 import { Howl } from "howler";
 import {Material, Mesh, TextureLoader} from "three";
 import convertRange from "@/lib/convertRange";
+import {gsap} from 'gsap-trial';
+import Link from "next/link";
+import BurgerMenu from "@/app/components/BurgerMenu";
+import {useAppDispatch, useAppSelector} from "@/lib/redux/hooks";
+import {ListInfo} from "@/utils/types";
+import {setMainHovered, setTrackList} from "@/lib/redux/mainSlice";
+import {RootState} from "@/lib/redux/store";
 
 const covers = [
     '/covers/333.jpg',
@@ -37,30 +44,27 @@ function Rig({ children }: {children: ReactNode }) {
 
 
 function Sphere({sound}: {sound: Howl}) {
+    const hovered = useAppSelector((state: RootState) => state.main.main_hovered);
+    const dispatch = useAppDispatch();
+
     const [hover, setHover] = useState(false);
     const [clicked, setClicked] = useState(false);
     let material_ref = useRef();
 
     const mouseEnter = () => {
         document.body.style.cursor = 'pointer';
+        dispatch(setMainHovered(true));
         setHover(true);
         sound.volume(0.1);
         sound.play();
     }
     const mouseLeave = () => {
         document.body.style.cursor = 'auto';
-        setHover(false);
+        //setHover(false);
         sound.stop();
     }
 
-    const handleClick = () => {
-        //TODO: if user clicks off the sphere, sound will p[lay twice when hovered then when clicked
-        if (!clicked) {
-            sound.play();
-            sound.volume(0.05);
-            setClicked(true);
-        }
-    }
+
 
     const ctx = Howler.ctx;
     const analyser = ctx.createAnalyser();
@@ -82,8 +86,8 @@ function Sphere({sound}: {sound: Howl}) {
 
     let data = new Uint8Array(analyser.frequencyBinCount);
 
-
-    useFrame(() => {
+    const vec = new THREE.Vector3();
+    useFrame((state) => {
         analyser.getByteFrequencyData(data);
         const getAvg = (array: Uint8Array) => array.reduce((a, b) => a + b) / array.length;
         //console.log(avg(data.slice(0,20)));
@@ -116,10 +120,17 @@ function Sphere({sound}: {sound: Howl}) {
                 new_max: 0.08
             }
         })
-        console.log(low);
-        material_ref.current.thickness = low;
-        material_ref.current.chromaticAberration = high;
-        material_ref.current.roughness = low_rough;
+        //console.log(low);
+        material_ref.current!.thickness = low;
+        material_ref.current!.chromaticAberration = high;
+        material_ref.current!.roughness = low_rough;
+
+        if (hovered) {
+            state.camera.position.lerp(vec.set(250, 0, 140), .008);
+        } else {
+            state.camera.position.lerp(vec.set(100, 0, 140), 0.008);
+        }
+
     });
 
 
@@ -145,7 +156,7 @@ function Logo() {
     const ref = useRef();
     useFrame(({ clock }) => {
         ref.current!.rotation.z = clock.getElapsedTime()/10;
-        ref.current!.rotation.y = clock.getElapsedTime()/100
+        ref.current!.rotation.y = clock.getElapsedTime()/100;
         geom.center();
     });
 
@@ -160,9 +171,11 @@ function Logo() {
     )
 }
 
-function AlbumSphere({x, y, texture}: {x: number, y: number, texture: THREE.Texture}) {
+function AlbumSphere({x, y, texture, album_name, list_info}: {x: number, y: number, texture: THREE.Texture, album_name: string, list_info: ListInfo}) {
     const [hover, setHover] = useState(false);
     const [clicked, setClicked] = useState(false);
+    const dispatch = useAppDispatch();
+    const main_hovered = useAppSelector((state: RootState) => state.main.main_hovered);
 
     const mouseEnter = () => {
         document.body.style.cursor = 'pointer';
@@ -174,14 +187,19 @@ function AlbumSphere({x, y, texture}: {x: number, y: number, texture: THREE.Text
     }
 
     const handleClick = () => {
-        //TODO: if user clicks off the sphere, sound will p[lay twice when hovered then when clicked
-        if (!clicked) {
-            setClicked(true);
-        }
+        const album_obj = list_info.albums.filter(a => a.album_name === album_name)[0];
+        dispatch(setTrackList(album_obj.track_list));
     }
     const props = useSpring({
-        thickness: hover ? 35 : 15,
-        chromatic: hover ? 0.01 : 0,
+        thickness: hover ? 55 : 45,
+        chromatic: hover ? 0.09 : 0,
+    });
+
+    const scale_props = useSpring({
+        scale: main_hovered ? 1 : 0,
+        config: {
+            duration: 1000,
+        }
     });
 
     const camera = useThree((state) => state.camera)
@@ -193,11 +211,11 @@ function AlbumSphere({x, y, texture}: {x: number, y: number, texture: THREE.Text
 
     return (
         <>
-            <mesh position={[x, y , 0]} onUpdate={self => self.lookAt(camera_ref.current)}>
+            <animated.mesh scale={scale_props.scale} position={[x, y , 0]} onUpdate={self => self.lookAt(camera_ref.current)}>
                 <circleBufferGeometry attach={'geometry'} args={[18, 28]}/>
                 <meshBasicMaterial attach={'material'} map={texture} />
-            </mesh>
-            <mesh position={[x, y, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()}>
+            </animated.mesh>
+            <animated.mesh scale={scale_props.scale} position={[x, y, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()} onClick={() => handleClick()}>
                 <icosahedronGeometry args={[20, 50]} />
                 <AnimatedTransmission
                     anisotropy={0}
@@ -207,12 +225,12 @@ function AlbumSphere({x, y, texture}: {x: number, y: number, texture: THREE.Text
                     thickness={props.thickness}
                     chromaticAberration={props.chromatic}
                     distortionScale={0} temporalDistortion={0}/>
-            </mesh>
+            </animated.mesh>
         </>
     );
 }
 
-export function AlbumSpheres() {
+export function AlbumSpheres({list_info}: {list_info: ListInfo}) {
     let n = 6;
     let max = 100;
     let coords: {x: number, y: number}[] = [];
@@ -223,13 +241,20 @@ export function AlbumSpheres() {
         coords.push({x: x, y: y});
     }
 
-    const texture = useLoader(TextureLoader, covers[0]);
+    const three = useLoader(TextureLoader, covers[0]);
+    const crest = useLoader(TextureLoader, covers[1]);
+    const eversince = useLoader(TextureLoader, covers[2]);
+    const exeter = useLoader(TextureLoader, covers[3]);
+    const redlight = useLoader(TextureLoader, covers[4]);
+    const thefool = useLoader(TextureLoader, covers[5]);
+    const albums = ['333', 'Crest [with Ecco2k]', 'Eversince', 'Exeter', 'Red Light', 'The Fool'];
+    const textures = [three, crest, eversince, exeter, redlight, thefool];
     return (
         <group>
             {coords.map((coord, i) => {
                 return (
-                    <group key={i} rotation={[5, 0, 0]} >
-                        <AlbumSphere x={coord.x} y={coord.y} texture={texture} />
+                    <group key={i} rotation={[0, 70, 0]} >
+                        <AlbumSphere x={coord.x} y={coord.y} texture={textures[i]} album_name={albums[i]} list_info={list_info}/>
                     </group>
                 )
             })}
@@ -237,7 +262,7 @@ export function AlbumSpheres() {
     )
 }
 
-export default async function Landing({json_string}: {json_string: string}) {
+export default async function Landing({list_info}: {list_info: ListInfo}) {
     const sound = new Howl({
         src: ['cut_file.mp3'],
         volume: .1,
@@ -260,12 +285,14 @@ export default async function Landing({json_string}: {json_string: string}) {
 
     return (
         <div className={'w-screen h-screen flex items-center justify-center bg-black absolute'}>
+            {/*
             <div className={'z-50 fixed w-screen h-screen flex flex-col items-start justify-start p-[100px] selection:text-black selection:bg-white bg-blend-difference pointer-events-none'}>
                 <div className={'w-fit h-fit flex flex-col'}>
                     <span className={'relative text-white text-[35px] selection:text-black selection:bg-white'}>BLADEELE</span>
                     <span className={'relative text-white text-[20px] self-end'}>B_ZY</span>
                 </div>
             </div>
+            */}
             <a.div style={props}
                 className={`w-screen h-screen flex items-center justify-center fixed z-50 bg-black`}
                 onClick={() => startTransition(() => setActive(false))}>
@@ -277,7 +304,7 @@ export default async function Landing({json_string}: {json_string: string}) {
                 <OrbitControls />
                 <Rig>
                     <Logo />
-                    <AlbumSpheres />
+                    <AlbumSpheres list_info={list_info} />
                     <Sphere sound={sound} />
                 </Rig>
                 <directionalLight

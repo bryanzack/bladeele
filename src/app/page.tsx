@@ -7,6 +7,7 @@ import Image from "next/image";
 import Landing from "@/app/components/Landing";
 import path from "path";
 import fs from "fs";
+import Info from "@/app/components/Info";
 
 export default async function Home() {
     /*
@@ -25,8 +26,8 @@ export default async function Home() {
 
          */
         <>
-            <Input list_info={track_list} />
-            <Landing json_string={JSON.stringify(track_list)}/>
+            <Info />
+            <Landing list_info={track_list}/>
         </>
     )
 }
