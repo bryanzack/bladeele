@@ -7,12 +7,7 @@ import * as THREE from 'three';
 import { useSpring, animated} from "@react-spring/three";
 import { MeshTransmissionMaterial } from "@react-three/drei"
 import { Howl } from "howler";
-import EnterDialogue from "@/app/components/EnterDialogue";
-import {useAtom} from "jotai";
-import {acceptedAtom} from "@/jotai/atoms";
-import Input from "@/app/components/Input";
 import {Material, Mesh, TextureLoader} from "three";
-import {cameraPosition} from "three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements";
 import convertRange from "@/lib/convertRange";
 
 const covers = [
@@ -80,30 +75,63 @@ function Sphere({sound}: {sound: Howl}) {
     const chromatic_max = 1;
     const chromatic_min = .01;
 
+    const roughness_max = 0.1;
+    const roughness_min = 0;
+
 
     let data = new Uint8Array(analyser.frequencyBinCount);
 
 
     useFrame(() => {
         analyser.getByteFrequencyData(data);
-        //material_ref.current.thickness = convertRange({params: {}})[50];
-        //material_ref.current.chromaticAberration = data[10000];
-        console.log(material_ref.thickness);
+        const getAvg = (array: Uint8Array) => array.reduce((a, b) => a + b) / array.length;
+        //console.log(avg(data.slice(0,20)));
+        const avg_low = getAvg(data.slice(0,20));
+        const avg_high = getAvg(data.slice(400,1023));
+        const high = convertRange({
+            params: {
+                old_value: avg_high,
+                old_min: 0,
+                old_max: 255,
+                new_min: 0.01,
+                new_max: 1,
+            }
+        });
+        const low = convertRange({
+            params: {
+                old_value: avg_low,
+                old_min: 0,
+                old_max: 255,
+                new_min: 60,
+                new_max: 100,
+            }
+        });
+        const low_rough = convertRange({
+            params: {
+                old_value: avg_low,
+                old_min: 0,
+                old_max: 255,
+                new_min: 0.02,
+                new_max: 0.08
+            }
+        })
+        console.log(low);
+        material_ref.current.thickness = low;
+        material_ref.current.chromaticAberration = high;
+        material_ref.current.roughness = low_rough;
     });
 
 
     return (
         <mesh position={[0, 0, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()} onClick={() => handleClick()}>
             <icosahedronGeometry args={[55, 50]} />
-            <AnimatedTransmission
+            <MeshTransmissionMaterial
+                ref={material_ref}
                 anisotropy={0}
                 anisotropicBlur={0}
                 transmission={1}
-                roughness={0.05}
                 metalness={0}
                 distortionScale={0}
-                thickness={props.thickness}
-                chromaticAberration={props.chromatic}
                 temporalDistortion={0}/>
         </mesh>
     );
@@ -215,6 +243,10 @@ export default async function Landing({json_string}: {json_string: string}) {
             console.log('loaded sound')
         }
     });
+
+    useEffect(() => {
+
+    }, []);
 
     return (
         <div className={'w-screen h-screen flex items-center justify-center bg-black absolute'}>
