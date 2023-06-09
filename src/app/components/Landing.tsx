@@ -29,10 +29,10 @@ const covers = [
 const AnimatedTransmission = animated(MeshTransmissionMaterial);
 
 function Rig({ children }: {children: ReactNode }) {
-    const ref = useRef();
+    const ref = useRef<any>();
     useFrame((state) => {
-        ref.current.rotation.y = THREE.MathUtils.lerp(ref.current.rotation.y, (state.mouse.x * Math.PI) / 7, 0.05);
-        ref.current.rotation.x = THREE.MathUtils.lerp(ref.current.rotation.x, (state.mouse.y * Math.PI) / 7, 0.05);
+        ref.current!.rotation.y = THREE.MathUtils.lerp(ref.current!.rotation.y, (state.mouse.x * Math.PI) / 7, 0.05);
+        ref.current!.rotation.x = THREE.MathUtils.lerp(ref.current!.rotation.x, (state.mouse.y * Math.PI) / 7, 0.05);
     })
     return <group ref={ref}>{children}</group>
 
@@ -47,7 +47,7 @@ function Sphere({sound}: {sound: Howl}) {
 
     const [hover, setHover] = useState(false);
     const [clicked, setClicked] = useState(false);
-    let material_ref = useRef();
+    let material_ref = useRef<any>();
 
     const mouseEnter = () => {
         document.body.style.cursor = 'pointer';
@@ -135,9 +135,10 @@ function Sphere({sound}: {sound: Howl}) {
 
 
     return (
-        <mesh position={[0, 0, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()} onClick={() => handleClick()}>
+        <mesh position={[0, 0, 0]} onPointerEnter={() => mouseEnter()} onPointerLeave={() => mouseLeave()}>
             <icosahedronGeometry args={[55, 50]} />
-            <AnimatedTransmission
+            {/* @ts-ignore */}
+            <animated.meshTransmissionMaterial
                 thickness={props.thickness}
                 ref={material_ref}
                 anisotropy={0}
@@ -153,7 +154,7 @@ function Sphere({sound}: {sound: Howl}) {
 function Logo() {
     const geom = useLoader(STLLoader, '/untitled.stl');
     geom.computeVertexNormals();
-    const ref = useRef();
+    const ref = useRef<any>();
     useFrame(({ clock }) => {
         ref.current!.rotation.z = clock.getElapsedTime()/10;
         ref.current!.rotation.y = clock.getElapsedTime()/100;
@@ -294,11 +295,12 @@ export default async function Landing({list_info, base64}: {list_info: ListInfo,
                 </div>
             </div>
             */}
-            <a.div style={props}
+            {/* @ts-ignore */}
+            <animated.div style={props.opacity}
                 className={`w-screen h-screen flex items-center justify-center fixed z-50 bg-black`}
                 onClick={() => startTransition(() => setActive(false))}>
                 <span className={'text-white font-montserrat text-2xl cursor-pointer'}>Enter.</span>
-            </a.div>
+            </animated.div>
 
             <Canvas camera={{position: [100, 0, 140]}} dpr={4}>
                 {/*<Background /> */}
