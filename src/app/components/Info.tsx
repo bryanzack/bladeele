@@ -9,7 +9,7 @@ import {setDidWin, setMainHovered, setTrackList} from "@/lib/redux/mainSlice";
 export default function Info() {
     const track_list = useAppSelector((state: RootState) => state.main.track_list);
     const did_win = useAppSelector((state: RootState) => state.main.did_win);
-
+//
     const dispatch = useAppDispatch();
     const handleGuess = async (guess: string) => {
         if (await isGuessCorrect(guess)) {
