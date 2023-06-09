@@ -1,0 +1,1 @@
+export const answer = 'Rain3ow Star (Love is All)'
