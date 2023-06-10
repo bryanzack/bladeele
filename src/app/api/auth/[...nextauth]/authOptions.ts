@@ -29,5 +29,6 @@ export const authOptions: AuthOptions = {
             session!.user!.username = token.username;
             return session;
         }
-    }
+    },
+    secret: process.env.NEXTAUTH_SECRET,
 }
