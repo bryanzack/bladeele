@@ -92,6 +92,9 @@ dependencies:
   tailwindcss:
     specifier: 3.3.2
     version: 3.3.2
+  three:
+    specifier: ^0.153.0
+    version: 0.153.0
   three-stdlib:
     specifier: ^2.23.9
     version: 2.23.9(three@0.153.0)
