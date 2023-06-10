@@ -13,7 +13,11 @@ import {Howl} from "howler";
 export default async function Home() {
     const curdir = path.resolve('.');
     const fs = require('fs');
-    const contents = fs.readFileSync(`${curdir}/src/utils/files/output/daily/cut_file.mp3`, {encoding: 'base64'});
+    const snippet = fs.readFileSync(`${curdir}/src/utils/files/output/daily/cut_file.mp3`, {encoding: 'base64'});
+    const snippet_win = fs.readFileSync(`${curdir}/src/utils/files/output/daily/cut_file_win.mp3`, {encoding: 'base64'});
+    const session = await getServerSession(authOptions);
+    console.log('from page.tsx');
+    console.log(session);
     return (
         /*
         <main className="flex min-h-screen flex-col items-center justify-start p-24 border border-black">
@@ -25,7 +29,7 @@ export default async function Home() {
          */
         <>
             <Info />
-            <Landing list_info={track_list} base64={contents} />
+            <Landing list_info={track_list} base64={[snippet, snippet_win]} />
         </>
     )
 }
