@@ -38,7 +38,7 @@ export default async function RootLayout({
             <Providers>
                 {children}
             </Providers>}
-        {/* @ts-ignore */}
+        {/* @ts-ignore asdfds*/}
         {!whitelist.includes(session!.user!.username) &&
             <Login />}
         </body>
