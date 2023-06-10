@@ -1,10 +1,6 @@
 import './globals.css'
 import {Inter, Montserrat} from 'next/font/google'
 import Providers from "@/app/components/Providers";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/[...nextauth]/authOptions";
-import Login from "@/app/components/Login";
-import whitelist from "../../whitelist";
 
 const path = require('path');
 // @ts-ignore
@@ -17,7 +13,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata = {
-    title: 'login',
+    title: 'bladeele',
     description: 'by b_zy',
 }
 
@@ -27,20 +23,12 @@ export default async function RootLayout({
     children: React.ReactNode
 }) {
 
-    const session = await getServerSession(authOptions);
-    console.log('from layout')
-    console.log(session);
     return (
         <html lang="en">
         <body className={`${inter.className} ${montserrat.className}`}>
-        {/* @ts-ignore */}
-        {whitelist.includes(session!.user!.username) &&
             <Providers>
                 {children}
-            </Providers>}
-        {/* @ts-ignore asdfds*/}
-        {!whitelist.includes(session!.user!.username) &&
-            <Login />}
+            </Providers>
         </body>
         </html>
     )
