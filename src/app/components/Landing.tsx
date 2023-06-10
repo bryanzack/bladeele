@@ -335,14 +335,6 @@ export default async function Landing({list_info, base64}: { list_info: ListInfo
 
     return (
         <div className={'w-screen h-screen flex items-center justify-center bg-black absolute'}>
-            {/*
-            <div className={'z-50 fixed w-screen h-screen flex flex-col items-start justify-start p-[100px] selection:text-black selection:bg-white bg-blend-difference pointer-events-none'}>
-                <div className={'w-fit h-fit flex flex-col'}>
-                    <span className={'relative text-white text-[35px] selection:text-black selection:bg-white'}>BLADEELE</span>
-                    <span className={'relative text-white text-[20px] self-end'}>B_ZY</span>
-                </div>
-            </div>
-            */}
             {/* @ts-ignore */}
             <a.div style={props}
                    className={`w-screen h-screen flex items-center justify-center fixed z-50 bg-black`}
