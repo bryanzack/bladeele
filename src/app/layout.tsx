@@ -27,20 +27,12 @@ export default async function RootLayout({
     children: React.ReactNode
 }) {
 
-    const session = await getServerSession(authOptions);
-    console.log('from layout')
-    console.log(session);
     return (
         <html lang="en">
         <body className={`${inter.className} ${montserrat.className}`}>
-        {/* @ts-ignore */}
-        {whitelist.includes(session!.user!.username) &&
             <Providers>
                 {children}
-            </Providers>}
-        {/* @ts-ignore asdfds*/}
-        {!whitelist.includes(session!.user!.username) &&
-            <Login />}
+            </Providers>
         </body>
         </html>
     )
