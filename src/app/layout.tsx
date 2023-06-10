@@ -1,10 +1,6 @@
 import './globals.css'
 import {Inter, Montserrat} from 'next/font/google'
 import Providers from "@/app/components/Providers";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/[...nextauth]/authOptions";
-import Login from "@/app/components/Login";
-import whitelist from "../../whitelist";
 
 const path = require('path');
 // @ts-ignore
