@@ -35,6 +35,9 @@ dependencies:
   '@types/react-dom':
     specifier: 18.2.4
     version: 18.2.4
+  '@types/three':
+    specifier: ^0.152.1
+    version: 0.152.1
   audio-decode:
     specifier: ^2.1.3
     version: 2.1.3
