@@ -1,6 +1,7 @@
 import './globals.css'
 import {Inter, Montserrat} from 'next/font/google'
 import Providers from "@/app/components/Providers";
+import Info from "@/app/components/Info";
 
 const path = require('path');
 // @ts-ignore
@@ -27,6 +28,7 @@ export default async function RootLayout({
         <html lang="en">
         <body className={`${inter.className} ${montserrat.className}`}>
             <Providers>
+                <Info />
                 {children}
             </Providers>
         </body>

@@ -5,12 +5,14 @@ export type SliceData = {
     track_list: string[],
     main_hovered: boolean,
     did_win: boolean,
+    menu_state: boolean,
 }
 
 const initialState: SliceData = {
     track_list: [''],
     main_hovered: false,
     did_win: false,
+    menu_state: false,
 }
 
 export const mainSlice = createSlice({
@@ -25,7 +27,10 @@ export const mainSlice = createSlice({
         },
         setDidWin: (state, action: PayloadAction<typeof initialState.did_win>) => {
             state.did_win = action.payload;
-        }
+        },
+        toggleMenuState: (state) => {
+            state.menu_state = !state.menu_state
+        },
     }
 });
 
@@ -35,6 +40,7 @@ export const {
     setTrackList,
     setMainHovered,
     setDidWin,
+    toggleMenuState,
 } = actions;
 
 export default reducer;

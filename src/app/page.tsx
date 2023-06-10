@@ -28,7 +28,6 @@ export default async function Home() {
 
          */
         <>
-            <Info />
             <Landing list_info={track_list} base64={[snippet, snippet_win]} />
         </>
     )

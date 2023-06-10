@@ -9,7 +9,7 @@ import {setDidWin, setMainHovered, setTrackList} from "@/lib/redux/mainSlice";
 export default function Info() {
     const track_list = useAppSelector((state: RootState) => state.main.track_list);
     const did_win = useAppSelector((state: RootState) => state.main.did_win);
-//
+    const menu_state = useAppSelector((state: RootState) => state.main.menu_state);
     const dispatch = useAppDispatch();
     const handleGuess = async (guess: string) => {
         if (await isGuessCorrect(guess)) {
@@ -32,14 +32,21 @@ export default function Info() {
                         <span className={'pointer-events-auto text-white font-montserrat selection:text-black selection:bg-white'}>B_ZY</span>
                     </Link>
                 </div>
-                <div className={'w-full h-[700px] mt-[25px] flex flex-col items-center justify-start'}>
-                    {track_list.map((track, i) => (
-                        <span key={i} onClick={() => handleGuess(track)}
-                              className={'text-white truncate hover:border-opacity-50 hover:border-b-white hover:border-b-[1px] border-b-transparent border-b-[1px] cursor-pointer pointer-events-auto'}>
+                {menu_state &&
+                    <div className={'flex flex-col items-center justify-center mt-[20px]'}>
+                        <span className={'text-white font-montserrat text-md'}>VISUALIZER</span>
+                    </div>
+                }
+                {!menu_state &&
+                    <div className={'w-full h-[700px] mt-[25px] flex flex-col items-center justify-start'}>
+                        {track_list.map((track, i) => (
+                            <span key={i} onClick={() => handleGuess(track)}
+                                  className={'text-white truncate hover:border-opacity-50 hover:border-b-white hover:border-b-[1px] border-b-transparent border-b-[1px] cursor-pointer pointer-events-auto'}>
                             {track}
                         </span>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                }
             </div>
         </div>
     )
