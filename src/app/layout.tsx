@@ -17,7 +17,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata = {
-    title: 'login',
+    title: 'bladeele',
     description: 'by b_zy',
 }
 
