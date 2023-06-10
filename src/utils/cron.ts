@@ -50,6 +50,14 @@ async function cutFile(track_object: {track_path: string, track_name: string}, d
         start: start,
         end: end
     });
+
+    MP3Cutter.cut({
+        src: track_object.track_path,
+        target: `${output_dir}/cut_file_win.mp3`,
+        start: start,
+        end: length,
+    });
+
     const answer = {
         answer: `${track_object.track_name.slice(4, track_object.track_name.length-4)}`,
     }

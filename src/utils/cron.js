@@ -87,6 +87,12 @@ function cutFile(track_object, difficulty, output_dir) {
                         start: start,
                         end: end
                     });
+                    MP3Cutter.cut({
+                        src: track_object.track_path,
+                        target: "".concat(output_dir, "/cut_file_win.mp3"),
+                        start: start,
+                        end: length,
+                    });
                     answer = {
                         answer: "".concat(track_object.track_name.slice(4, track_object.track_name.length - 4)),
                     };
